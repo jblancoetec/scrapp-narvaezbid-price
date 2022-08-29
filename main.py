@@ -61,7 +61,7 @@ def getPublication(url):
 def getPublicationsForCompare(urls):
     publications = map(lambda url: getPublication(url), urls)
     df = DataFrame(data=publications, columns=['title', 'price'])
-    df.to_excel('publicaciones.xlsx')
+    df.to_excel('publicaciones.xlsx', index=False)
 
 
 getPublicationsForCompare(urls)
