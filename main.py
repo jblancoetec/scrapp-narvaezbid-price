@@ -30,6 +30,7 @@ def getPrice(browser) -> str:
             state = FOUND_STATE
         except:
             attempts -= 1
+            browser.navigate().refresh()
 
     return price
 
@@ -45,6 +46,7 @@ def getTitle(browser) -> str:
             state = FOUND_STATE
         except:
             attempts -= 1
+            browser.navigate().refresh()
 
     return title
 
