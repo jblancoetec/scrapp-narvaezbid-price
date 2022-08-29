@@ -16,46 +16,36 @@ pathToChrome = chrome.install()
 service = Service(pathToChrome)
 
 
-def getPrice(browser) -> str:
+def trySearch(callback, browser):
     attempts = MAX_ATTEMPTS
-    state = NOT_FOUND_STATE
-    price = 'price not found'
-    while state == NOT_FOUND_STATE and attempts > 0:
+    while attempts > 0:
         try:
-            div = browser.find_element(
-                By.XPATH, '//div[@class="MuiGrid-root css-rfnosa"]')
-            span = div.find_element(By.XPATH, './/span[3]')
-            text = span.text.split(sep=' ')
-            price = text[4]
-            state = FOUND_STATE
+            result = callback(browser)
+            return result
         except:
             attempts -= 1
-            browser.navigate().refresh()
 
+
+def getPrice(browser) -> str:
+    div = browser.find_element(
+        By.XPATH, '//div[@class="MuiGrid-root css-rfnosa"]')
+    span = div.find_element(By.XPATH, './/span[3]')
+    text = span.text.split(sep=' ')
+    price = text[4]
     return price
 
 
 def getTitle(browser) -> str:
-    attempts = MAX_ATTEMPTS
-    state = NOT_FOUND_STATE
-    title = 'title not found'
-    while state == NOT_FOUND_STATE and attempts > 0:
-        try:
-            title = browser.find_element(By.XPATH, '//h1')
-            title = title.text
-            state = FOUND_STATE
-        except:
-            attempts -= 1
-            browser.navigate().refresh()
-
+    title = browser.find_element(By.XPATH, '//h1')
+    title = title.text
     return title
 
 
 def getPublication(url):
     browser = webdriver.Chrome(service=service)
     browser.get(url)
-    title = getTitle(browser)
-    price = getPrice(browser)
+    title = trySearch(getTitle, browser)
+    price = trySearch(getPrice, browser)
     browser.close()
     return [title, price]
 
