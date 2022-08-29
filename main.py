@@ -8,8 +8,6 @@ urls = ['https://www.narvaezbid.com.ar/oferta/fiat-pick-up-cabina-doble-strada-a
         'https://www.narvaezbid.com.ar/oferta/fiat-sedan-5-puertas-punto-hlx-18-ano-2009-dom-hsi807-ubicacion-san-fernando-provincia-de-buenos-aires-2477501']
 
 MAX_ATTEMPTS = 5
-NOT_FOUND_STATE = 1
-FOUND_STATE = 2
 
 chrome = ChromeDriverManager()
 pathToChrome = chrome.install()
