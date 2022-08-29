@@ -14,6 +14,14 @@ Procurar tener actualizado `python` . Si desea asegurarse, puede ejecutar el com
 - En windows, desde la windows store.
 - En linux, esta pre instalado por defecto.
 
+Por defecto, la aplicación utiliza Chrome como base para scrapper. Tener este instalado al momento de ejecutar la aplicación.
+
+## Variables de entorno
+
+En el archivo `main.py`:
+
+- La variable `urls` es el listado de enlaces a scrapear. 
+
 ## Instalación y ejecución
 
 - 🛠Para instalar las dependencias ejecutar el siguiente comando `pip install -r requirements.txt`
