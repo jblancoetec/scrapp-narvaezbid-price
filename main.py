@@ -1,77 +1,64 @@
-from turtle import pu
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+from pandas import DataFrame
+
+MAX_ATTEMPTS = 5
+NOT_FOUND_STATE = 1
+FOUND_STATE = 2
 
 chrome = ChromeDriverManager()
 pathToChrome = chrome.install()
 service = Service(pathToChrome)
 
 
-class Publication:
-    def __init__(self, title='', price='') -> None:
-        self.title = title
-        self.price = price
-
-    def __str__(self) -> str:
-        return f'Publication[title: {self.title}, price: {self.price}]'
-
-
-def getPrice(driver) -> str:
-    attempts = 5
-    state = 'incomplete'
+def getPrice(browser) -> str:
+    attempts = MAX_ATTEMPTS
+    state = NOT_FOUND_STATE
     price = 'price not found'
-    while state == 'incomplete' and attempts > 0:
+    while state == NOT_FOUND_STATE and attempts > 0:
         try:
-            # div = html.find('div', {'class': 'MuiGrid-root css-rfnosa'})
-            div = driver.find_element(
+            div = browser.find_element(
                 By.XPATH, '//div[@class="MuiGrid-root css-rfnosa"]')
             span = div.find_element(By.XPATH, './/span[3]')
             text = span.text.split(sep=' ')
             price = text[4]
-            state = 'complete'
+            state = FOUND_STATE
         except:
             attempts -= 1
 
     return price
 
 
-def getTitle(driver) -> str:
-    attempts = 5
-    state = 'incomplete'
+def getTitle(browser) -> str:
+    attempts = MAX_ATTEMPTS
+    state = NOT_FOUND_STATE
     title = 'title not found'
-    while state == 'incomplete' and attempts > 0:
+    while state == NOT_FOUND_STATE and attempts > 0:
         try:
-            title = driver.find_element(By.XPATH, '//h1')
+            title = browser.find_element(By.XPATH, '//h1')
             title = title.text
-            state = 'complete'
+            state = FOUND_STATE
         except:
             attempts -= 1
 
-    title = title.replace(',', '-')
     return title
 
 
 def getPublication(url):
-    driver = webdriver.Chrome(service=service)
-    driver.get(url)
-    title = getTitle(driver)
-    price = getPrice(driver)
-    publication = Publication(title=title, price=price)
-    driver.close()
-    return publication
+    browser = webdriver.Chrome(service=service)
+    browser.get(url)
+    title = getTitle(browser)
+    price = getPrice(browser)
+    browser.close()
+    return [title, price]
 
 
 def getPublicationsForCompare(urls):
     publications = map(lambda url: getPublication(url), urls)
-    with open('./publicaciones.csv', 'w') as file:
-        file.write('description, price\n')
-        for publication in publications:
-            file.write(f'{publication.title}, {publication.price}\n')
-
-    # publications = map(lambda p: str(p), publications)
-    # print(list(publications))
+    df = DataFrame(data=publications, columns=['title', 'price'])
+    df.to_excel('publicaciones.xlsx')
 
 
 urls = ['https://www.narvaezbid.com.ar/oferta/fiat-pick-up-cabina-doble-strada-adventure-16-ano-2018-dom-ac683wl-ubicacion-san-fernando-provincia-de-buenos-aires-2477505',
