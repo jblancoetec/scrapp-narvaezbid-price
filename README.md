@@ -1,6 +1,6 @@
-# Base para proyectos en Web Scrapper con Python y BeutifulSoup:writing_hand:
+# Base para proyectos en Web Scrapper con Python y Selenium:writing_hand:
 
-Este template muestra un pequeño ejemplo de como trabajar con BeutifulSoup tratando de extraer los precios de ciertos artículos en el sitio [Narvaezbid](https://www.narvaezbid.com.ar/)
+Este template muestra un pequeño ejemplo de como trabajar con Selenium tratando de extraer los precios de ciertos artículos en el sitio [Narvaezbid](https://www.narvaezbid.com.ar/)
 
 ## Entorno
 
