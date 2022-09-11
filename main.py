@@ -14,7 +14,7 @@ pathToChrome = chrome.install()
 service = Service(pathToChrome)
 
 
-def getPublication(url):
+def getPublication(url: str) -> tuple[str, str]:
     __brouser__ = webdriver.Chrome(service=service)
     __brouser__.get(url)
 
@@ -27,7 +27,7 @@ def getPublication(url):
             except:
                 attempts -= 1
                 __brouser__.refresh()
-        return 'not found'
+        return 'not found, try again'
 
     def getPrice() -> str:
         div = __brouser__.find_element(
@@ -45,7 +45,7 @@ def getPublication(url):
     title = trySearch(getTitle)
     price = trySearch(getPrice)
     __brouser__.close()
-    return [title, price]
+    return (title, price)
 
 
 def getPublicationsForCompare(urls):
