@@ -1,57 +1,72 @@
+from ast import Try
+from msilib.schema import PublishComponent
+import re
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from pandas import DataFrame
-
-urls = ['https://www.narvaezbid.com.ar/oferta/fiat-pick-up-cabina-doble-strada-adventure-16-ano-2018-dom-ac683wl-ubicacion-san-fernando-provincia-de-buenos-aires-2477505',
-        'https://www.narvaezbid.com.ar/oferta/fiat-sedan-5-puertas-punto-hlx-18-ano-2009-dom-hsi807-ubicacion-san-fernando-provincia-de-buenos-aires-2477501']
-
-MAX_ATTEMPTS = 5
-
-chrome = ChromeDriverManager()
-pathToChrome = chrome.install()
-service = Service(pathToChrome)
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.expected_conditions import presence_of_element_located
+from selenium.common.exceptions import TimeoutException
 
 
-def getPublication(url: str) -> tuple[str, str]:
-    __brouser__ = webdriver.Chrome(service=service)
-    __brouser__.get(url)
+class Publication(webdriver.Chrome):
+    __chrome__ = ChromeDriverManager()
+    __pathToChromeDriver__ = __chrome__.install()
+    __service__ = Service(__pathToChromeDriver__)
 
-    def trySearch(callback) -> str:
-        attempts = MAX_ATTEMPTS
-        while attempts > 0:
-            try:
-                result = callback()
-                return result
-            except:
-                attempts -= 1
-                __brouser__.refresh()
-        return 'not found, try again'
+    def __init__(self, url: str):
+        super().__init__(service=Publication.__service__)
+        self.get(url=url)
 
-    def getPrice() -> str:
-        div = __brouser__.find_element(
-            By.XPATH, '//div[@class="MuiGrid-root css-rfnosa"]')
+    def getTitle(self) -> str:
+        wait = WebDriverWait(driver=self, timeout=20)
+        title = wait.until(
+            method=presence_of_element_located((By.TAG_NAME, 'h1')),
+            message="timeout"
+        )
+        return title.text
+
+    def getPrice(self) -> str:
+        wait = WebDriverWait(driver=self, timeout=20)
+        div = wait.until(
+            method=presence_of_element_located(
+                (By.XPATH, '//div[@class="MuiGrid-root css-rfnosa"]')),
+            message="timeout"
+        )
         span = div.find_element(By.XPATH, './/span[3]')
         text = span.text.split(sep=' ')
         price = text[4]
         return price
 
-    def getTitle() -> str:
-        title = __brouser__.find_element(By.XPATH, '//h1')
-        title = title.text
-        return title
+    def getPriceAndTitle(self) -> tuple[str, str]:
+        try:
+            title = self.getTitle()
+            price = self.getPrice()
+            return (title, price)
+        except TimeoutException as err:
+            return (err.msg, err.msg)
+        except BaseException:
+            return ("titile not found", "price not foud")
+        finally:
+            self.close()
 
-    title = trySearch(getTitle)
-    price = trySearch(getPrice)
-    __brouser__.close()
-    return (title, price)
+
+def readUrls() -> list[str]:
+    with open('urls.txt', 'r') as file:
+        urls = file.read().splitlines()
+        return urls
 
 
-def getPublicationsForCompare(urls):
-    publications = map(lambda url: getPublication(url), urls)
-    df = DataFrame(data=publications, columns=['title', 'price'])
+def main():
+    urls = readUrls()
+    publications = [Publication(url) for url in urls]
+    data = [publication.getPriceAndTitle()
+            for publication in publications]
+    publications = [publication.quit() for publication in publications]
+    df = DataFrame(data=data, columns=['title', 'price'])
     df.to_excel('publicaciones.xlsx', index=False)
 
 
-getPublicationsForCompare(urls)
+main()

@@ -16,11 +16,9 @@ Procurar tener actualizado `python` . Si desea asegurarse, puede ejecutar el com
 
 Por defecto, la aplicación utiliza Chrome como base para scrapper. Tener este instalado al momento de ejecutar la aplicación.
 
-## Variables de entorno
+## Archivo urls.txt
 
-En el archivo `main.py`:
-
-- La variable `urls` es el listado de enlaces a scrapear. 
+En el archivo `urls.txt` se guardan mediante lineas separadas, cada una de las urls donde se buscaran datos.
 
 ## Instalación y ejecución
 
