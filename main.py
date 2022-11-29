@@ -1,6 +1,3 @@
-from ast import Try
-from msilib.schema import PublishComponent
-import re
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 from selenium import webdriver
